@@ -13,7 +13,7 @@ export class User extends BaseEntity{
     role: string;
 
     @Column({nullable : false })
-    phone: number;
+    phone: string;
 
     @Column({nullable : false})
     password : string;

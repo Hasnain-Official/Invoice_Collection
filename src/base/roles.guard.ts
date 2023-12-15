@@ -15,8 +15,11 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
-    const { query : {role} } = context.switchToHttp().getRequest();
-    const res =  requiredRoles.some((allowed_role) => role ? role?.includes(allowed_role) : false);
+    let { user, params: {id} } = context.switchToHttp().getRequest();
+    console.log("ID - > ", id);
+    
+    user = !user ? {} : user;
+    const res =  requiredRoles.some((allowed_role) => user?.role ? user?.role?.includes(allowed_role) : false);
     if(!res) {
         throw new HttpException('Not Authorized for this function', HttpStatus.FORBIDDEN)
     }

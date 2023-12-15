@@ -39,7 +39,7 @@ export class AuthService {
     }
     return {status : 200, message : `Login Successful`, data : signInAuthDto, access_token: await this.jwtService.signAsync(payload)};
     } catch(err) {
-      console.log("Error => ", err);
+      console.error("Error => ", err);
       throw new UnauthorizedException(`Can't Login, Something went wrong.`);
     }
   }
@@ -64,9 +64,7 @@ export class AuthService {
         password : password,
         role : 'user'
       };
-      console.log("Check - > ", user_obj);
-      
-      await this.userRepository.create(user_obj);
+      await this.userRepository.save(user_obj);
       const wallet_obj: walletObjDto = {
         id : uuidv4(),
         card_number : cardNumber,
@@ -75,13 +73,11 @@ export class AuthService {
         user_uuid: user_obj['id'],
         amount : walletBalance || 0
       };
-      console.log("Wallet - > ", wallet_obj);
-      
-      await this.walletRepository.create(wallet_obj);
+      await this.walletRepository.save(wallet_obj);
       return {status : 200, message : `User Created Successfully`};
     }
    } catch(err) {
-    console.log("Error = > ", err);
+    console.error("Error = > ", err);
     throw new ConflictException(`User SignUp Failed`);
    }
   }
@@ -107,7 +103,7 @@ export class AuthService {
       }
       return {status : 200, message : `Login Successful`, data : signInAuthDto, access_token: await this.jwtService.signAsync(payload)};
     } catch(err) {
-      console.log("Error => ", err);
+      console.error("Error => ", err);
       throw new UnauthorizedException(`Can't Login, Something went wrong.`);
     }
   }
@@ -136,7 +132,7 @@ export class AuthService {
         return {status : 200, message : `Admin Created Successfully`};
       }
      } catch(err) {
-      console.log("Error = > ", err);
+      console.error("Error = > ", err);
       throw new ConflictException(`Admin SignUp Failed`);
      }
   }

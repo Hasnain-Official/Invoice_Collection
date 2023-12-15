@@ -9,11 +9,11 @@ export class CustomMiddlewareService implements NestMiddleware {
     if(!req?.query?.token || !req?.query?.role) {
         return {status : 400, message : `Missing required parameters : token or role in query`};
     }
-    const token = req?.query?.token;
-    const role = req?.query?.role;
-    if(!(token === 'aqazwsxedcrfvtgbyhnujmikolpa' || token === 'qazwsxedcrfvtgbyhnujmikolp')) {
-        return {status : 400, message : `Invalid Token!, You are not Authorized`};
-    }
+    // const token = req?.query?.token;
+    // const role = req?.query?.role;
+    // if(!(token === 'aqazwsxedcrfvtgbyhnujmikolpa' || token === 'qazwsxedcrfvtgbyhnujmikolp')) {
+    //     return {status : 400, message : `Invalid Token!, You are not Authorized`};
+    // }
     console.log('Custom Middleware');
     next(); // Pass control to the next middleware or route handler
   }

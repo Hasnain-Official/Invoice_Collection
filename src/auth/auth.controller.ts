@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserSignInAuthDto, UserSignUpAuthDto, AdminSignInAuthDto, AdminSignUpAuthDto } from './dto/create-auth.dto';
-import { AuthGuard } from './auth.guard';
 import { Public } from './constant';
+import { RolesGuard } from 'src/base/roles.guard';
+import { Roles } from 'src/base/roles.decorator';
+import { Role } from 'src/base/base.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -26,13 +28,13 @@ export class AuthController {
     return this.authService.adminSignIn(adminSignInAuthDto);
   }
 
-  @Public()
+  @UseGuards(RolesGuard)
+  @Roles(Role.admin)
   @Post('admin/signup')
   adminSignUp(@Body() adminSignUpAuthDto: AdminSignUpAuthDto) {
     return this.authService.adminSignUp(adminSignUpAuthDto);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.authService.findAll();

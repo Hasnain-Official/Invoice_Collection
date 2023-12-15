@@ -34,8 +34,8 @@ export class UserSignUpAuthDto {
     @IsString()
     readonly bankName: string;
   
-     @IsString()
-     readonly password: string;
+    @IsString()
+    readonly password: string;
 }
 
 export class AdminSignInAuthDto {
@@ -58,22 +58,9 @@ export class AdminSignUpAuthDto {
     @IsString()
     @Length(10, 10, { message: 'Phone number must be exactly 10 digits long' })
     readonly phone: string;
-  
-    // @IsNumber()
-    // @IsPositive()
-    // readonly walletBalance: number;
-  
-    // @IsString()
-    // readonly cardNumber: string;
-  
-    // @IsString()
-    // readonly ifscCode: string;
-  
-    // @IsString()
-    // readonly bankName: string;
-  
-     @IsString()
-     readonly password: string;
+
+    @IsString()
+    readonly password: string;
 }
 
 export class userObjDto {

@@ -1,15 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { CreateTransactionDto, WebhookBodyDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { RolesGuard } from 'src/base/roles.guard';
+import { Roles } from 'src/base/roles.decorator';
+import { Role } from 'src/base/base.entity';
 
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post(':invoiceId')
-  async create(@Param('invoiceId') invoiceId: string, @Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(invoiceId, createTransactionDto);
+  @UseGuards(RolesGuard)
+  @Roles(Role.admin, Role.user)
+  async create(@Req() request, @Param('invoiceId') invoiceId: string, @Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionService.create(request?.user, invoiceId, createTransactionDto);
+  }
+
+  @Post('webhook')
+  @UseGuards(RolesGuard)
+  @Roles(Role.admin, Role.user)
+  async webhook(@Req() req, @Body() bodyDto: WebhookBodyDto) {
+    return this.transactionService.webhook(req?.user, bodyDto)
   }
 
   @Get()

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
+import { CreateInvoiceDto, checkUUIDDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { RolesGuard } from 'src/base/roles.guard';
 import { Roles } from 'src/base/roles.decorator';
@@ -27,7 +27,7 @@ export class InvoiceController {
   @UseGuards(RolesGuard)
   @Roles(Role.admin, Role.user)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: checkUUIDDto) {
     return this.invoiceService.findOne(id);
   }
 
@@ -41,14 +41,14 @@ export class InvoiceController {
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: checkUUIDDto) {
     return this.invoiceService.remove(id);
   }
 
   @UseGuards(RolesGuard)
   @Roles(Role.admin, Role.user)
   @Get('invoice/status/:invoiceId')
-  status(@Param('invoiceId') invoiceId : string, @Query('status') status: string) {
+  status(@Param('invoiceId') invoiceId : checkUUIDDto, @Query('status') status: string) {
     return this.invoiceService.status(invoiceId, status);
   }
 }

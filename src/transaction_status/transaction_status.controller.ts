@@ -11,12 +11,14 @@ export class TransactionStatusController {
   constructor(private readonly transactionStatusService: TransactionStatusService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(Role.user)
-  @Post(':invoiceId')
-  create(@Param('invoiceId') invoiceId: string, @Body() createTransactionStatusDto: CreateTransactionStatusDto) {
+  @Roles(Role.admin)
+  @Post('create')
+  create(@Body() createTransactionStatusDto: CreateTransactionStatusDto) {
     return this.transactionStatusService.create(createTransactionStatusDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.admin, Role.user)
   @Get()
   findAll() {
     return this.transactionStatusService.findAll();
@@ -32,8 +34,10 @@ export class TransactionStatusController {
     return this.transactionStatusService.update(+id, updateTransactionStatusDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.admin)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.transactionStatusService.remove(+id);
+    return this.transactionStatusService.remove(id);
   }
 }

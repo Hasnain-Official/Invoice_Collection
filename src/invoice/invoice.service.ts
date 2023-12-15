@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
+import { CreateInvoiceDto, checkUUIDDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { Repository } from 'typeorm';
 import { Invoice } from './entities/invoice.entity';
@@ -16,37 +16,59 @@ export class InvoiceService {
     private readonly statusRepository : Repository<TransactionStatus>
   ) {}
   async create(createInvoiceDto: CreateInvoiceDto) {
-    const {total_amount, pending_amount, invoice_number, due_date} = createInvoiceDto;
+    const {total_amount, pending_amount, due_date} = createInvoiceDto;
     const status_pending = await this.statusRepository.findOne({
       where : {
         status : 'Pending'
       }
     });
+    const invoice_obj_id = uuidv4();
     const invoice_obj = {
-      id : uuidv4(),
-      invoice_number : invoice_number,
+      id : invoice_obj_id,
+      invoiceNumber : total_amount+invoice_obj_id+due_date,
       total_amount : total_amount,
       due_date : due_date,
       status_uuid : status_pending?.id,
-      pending_amount : pending_amount,
+      pendingAmount : pending_amount,
     };
-    await this.invoiceRepository.create(invoice_obj);
+    await this.invoiceRepository.save(invoice_obj);
     return {status : 200, message : `Invoice Generated`, data : invoice_obj};
   }
 
   async findAll() {
-    const invoices_data = this.invoiceRepository.find({
-      // relations : ['Status']
+    const invoices_data = await this.invoiceRepository.find({
+      select : {
+        id : true,
+        invoiceNumber : true,
+        total_amount : true,
+        due_date : true,
+        pendingAmount : true,
+        status : {
+          id : true,
+          status : true
+        }
+      },
+      relations : ['status']
     });
     return {status : 200, message : `Invoices Fetched Successfully`, data : invoices_data};
   }
 
-  async findOne(id: string) {
+  async findOne(uuid: checkUUIDDto) {
+    const {id} = uuid;
     const invoices_data = await this.invoiceRepository.findOne({
-      where : [
-        {id : id},
-        {invoiceNumber : id}
-      ]
+      where : {id : id},
+      select : {
+        id : true,
+        invoiceNumber : true,
+        total_amount : true,
+        due_date : true,
+        pendingAmount : true,
+        status : {
+          id : true,
+          status : true
+        }
+      },
+      relations : ['status']
     });
     return {status : 200, message : `Invoice Found`, data : invoices_data || {}};
   }
@@ -69,14 +91,16 @@ export class InvoiceService {
     return {status : 200, message : `Invoice Updated Successfully`, data : updateInvoiceDto};
   }
 
-  async remove(id: string) {
+  async remove(uuid: checkUUIDDto) {
+    const {id} = uuid;
     await this.invoiceRepository.delete({
-      invoiceNumber : id
+      id : id
     });
     return {status : 200, message : `Invoice Removed Successfully`};
   }
 
-  async status(invoiceId: string, status: string) {
+  async status(invoiceId: checkUUIDDto, status: string) {
+    const {id} = invoiceId;
     if(!status) {
       return {status : 400, message : `Missing required parameters : status`};
     }
@@ -91,7 +115,7 @@ export class InvoiceService {
     await this.invoiceRepository.update({
       status_uuid : status_data?.id
     }, {
-      invoiceNumber : invoiceId
+      id : id
     });
     return {status : 200, message : `Status Changed`, data : status};
   }
